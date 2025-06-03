@@ -96,7 +96,7 @@ class ErrorRate(ClassificationMoment):
         """Return the index listing the constraints."""
         return self._index
 
-    def gamma(self, predictor: Callable) -> nw.typing.IntoSeries:
+    def gamma(self, predictor: Callable) -> nw.typing.IntoDataFrame:
         """Calculate a vector of moments.
 
         When ErrorRate() is used as a constraint, then `gamma[j]≤0 for all j` is used as
@@ -110,7 +110,7 @@ class ErrorRate(ClassificationMoment):
 
         Returns
         -------
-        error : :class:`pandas.Series`
+        error : :class:`pandas.DataFrame`
             gamma value for the predictor
         """
         # self.X passed into the predict function of an estimator needs not to be a
@@ -134,10 +134,14 @@ class ErrorRate(ClassificationMoment):
             self._gamma_descr = str(error)
             return error
         else:
-            error = nw.new_series(
-                name="weighted_error",
-                values=[error_value],
-                native_namespace=nw.get_native_namespace(self.X),
+            # error = nw.new_series(
+            #     name="weighted_error",
+            #     values=[error_value],
+            #     native_namespace=nw.get_native_namespace(self.X),
+            # )
+            error = nw.from_dict(
+                {"index": self.index, "error": [error_value]},
+                backend=nw.get_native_namespace(self.X),
             )
             self._gamma_descr = str(error)
             return error.to_native()

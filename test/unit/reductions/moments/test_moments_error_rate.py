@@ -76,16 +76,16 @@ def test_error_rate_narwhals_compatible():
 
     classifier = HistGradientBoostingClassifier().fit(X_pd, y_pd)
     error_pd = errorrate_pd.gamma(classifier.predict)
-    assert isinstance(error_pd, pd.Series)
+    assert isinstance(error_pd, pd.DataFrame)
 
     classifier = HistGradientBoostingClassifier().fit(X_pl, y_pl)
     error_pl = errorrate_pl.gamma(classifier.predict)
-    assert isinstance(error_pl, pl.Series)
+    assert isinstance(error_pl, pl.DataFrame)
 
     classifier = HistGradientBoostingClassifier().fit(X_pa, y_pa)
     error_pa = errorrate_pa.gamma(classifier.predict)
-    assert isinstance(error_pa, (pa.Array, pa.ChunkedArray))
+    assert isinstance(error_pa, (pa.Array, pa.ChunkedArray, pa.Table))
 
-    assert np.array_equal(error_np.to_numpy(), error_pd.to_numpy())
-    assert np.array_equal(error_np.to_numpy(), error_pl.to_numpy())
-    assert np.array_equal(error_np.to_numpy(), error_pa.to_numpy())
+    assert np.array_equal(error_np.to_numpy(), error_pd["error"].to_numpy())
+    assert np.array_equal(error_np.to_numpy(), error_pl["error"].to_numpy())
+    assert np.array_equal(error_np.to_numpy(), error_pa["error"].to_numpy())
