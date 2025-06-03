@@ -126,7 +126,7 @@ class ErrorRate(ClassificationMoment):
         total_fn_cost = (signed_errors.filter(signed_errors > 0) * self.fn_cost).sum()
         total_fp_cost = (signed_errors.filter(signed_errors < 0) * self.fp_cost * -1).sum()
         error_value = (total_fn_cost + total_fp_cost) / self.total_samples
-        if isinstance(self.X, np.ndarray):
+        if isinstance(self.X, np.ndarray) or isinstance(self.X, pd.DataFrame):
             # TODO (when dependency from pandas is removed): remove this check to always
             # return the default backend type introduced in PR #1533; for now: if user
             # has passed np.array for X, still return a pd.Series as before
@@ -134,11 +134,7 @@ class ErrorRate(ClassificationMoment):
             self._gamma_descr = str(error)
             return error
         else:
-            # error = nw.new_series(
-            #     name="weighted_error",
-            #     values=[error_value],
-            #     native_namespace=nw.get_native_namespace(self.X),
-            # )
+            # since narwhals doesn't allow indexing, we return a dataframe to pass the index
             error = nw.from_dict(
                 {"index": self.index, "error": [error_value]},
                 backend=nw.get_native_namespace(self.X),
